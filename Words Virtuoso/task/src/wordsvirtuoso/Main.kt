@@ -1,5 +1,6 @@
 package wordsvirtuoso
 
+import java.io.File
 import java.util.regex.Pattern
 
 class Words() {
@@ -24,16 +25,39 @@ class Words() {
     }
 
     fun start() {
-        val word = this.askWord()
-        if (!this.checkWordIfEnglish(word)) {
-            println("The input has invalid characters.")
-        } else if (!this.checkWordSizeIfFive(word)) {
-            println("The input isn't a 5-letter string.")
-        } else if (this.checkIfWordHasDouble(word)) {
-            println("The input has duplicate letters.")
+        println("Input the words file:")
+        val filename = readln()
+        val file = File(filename)
+
+        if (file.exists()){
+            val lines = file.readLines()
+            var invalid = 0
+            for (word in lines){
+                if (!this.checkWordIfEnglish(word) || !this.checkWordSizeIfFive(word)
+                    || this.checkIfWordHasDouble(word)){
+                    invalid++
+                }
+            }
+            if (invalid > 0){
+                println("Warning: $invalid invalid words were found in the $filename file.")
+            } else {
+                println("All words are valid!")
+            }
         } else {
-            println("The input is a valid string.")
+            println("Error: The words file $filename doesn't exist.")
         }
+        kotlin.system.exitProcess(1)
+
+//        val word = this.askWord()
+//        if (!this.checkWordIfEnglish(word)) {
+//            println("The input has invalid characters.")
+//        } else if (!this.checkWordSizeIfFive(word)) {
+//            println("The input isn't a 5-letter string.")
+//        } else if (this.checkIfWordHasDouble(word)) {
+//            println("The input has duplicate letters.")
+//        } else {
+//            println("The input is a valid string.")
+//        }
     }
 }
 
