@@ -1,0 +1,15 @@
+type: code
+files:
+- name: src/Main.kt
+  visible: true
+  text: |-
+    fun Main(args: String) {
+        println("Everyone loves cats")
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/10490#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: Mon, 31 Oct 2022 14:21:21 UTC
+record: -1
