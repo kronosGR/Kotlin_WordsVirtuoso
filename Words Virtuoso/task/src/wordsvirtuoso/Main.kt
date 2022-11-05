@@ -2,12 +2,19 @@ package wordsvirtuoso
 
 import java.io.File
 import kotlin.random.Random
-import kotlin.system.exitProcess
 
 class Words(val firstFile: String, val secondFile: String) {
     lateinit var words: List<String>
     lateinit var secretWord: String
     lateinit var clue: Array<String>
+    lateinit var clues: ArrayList<String>
+    lateinit var letters: ArrayList<String>
+
+    var tries = 0
+
+    init {
+        resetAll()
+    }
 
     private fun askWord(): String {
         println()
@@ -15,8 +22,11 @@ class Words(val firstFile: String, val secondFile: String) {
         return readln()
     }
 
-    private fun resetClue() {
+    private fun resetAll() {
         clue = arrayOf("_", "_", "_", "_", "_")
+        letters = ArrayList<String>()
+        clues = ArrayList<String>()
+        tries = 0
     }
 
     private fun checkWordSizeIfFive(word: String): Boolean {
@@ -40,7 +50,7 @@ class Words(val firstFile: String, val secondFile: String) {
     private fun getSecretWord() {
         val ran = Random.nextInt(0, words.size)
         secretWord = words[ran]
-//        secretWord = "coats"
+//        secretWord = "storm"
     }
 
     private fun wordExists(word: String): Boolean {
@@ -48,21 +58,26 @@ class Words(val firstFile: String, val secondFile: String) {
     }
 
     private fun findCorrectLetters(word: String) {
-        resetClue()
 
+        clue = arrayOf("_", "_", "_", "_", "_")
         // check for correct position
         for (i in 0 until 5) {
             if (secretWord[i] == word[i]) {
                 clue[i] = word[i].toString().uppercase()
+            } else {
+                letters.add(word[i].toString().uppercase())
             }
         }
 
         // check for correct letter
         for (i in 0 until 5) {
             if (secretWord.contains(word[i]) && clue[i].equals("_")) {
+                letters.remove(word[i].toString().uppercase())
                 clue[i] = word[i].toString()
             }
         }
+        clues.add(clue.joinToString(""))
+        letters.sortBy { it }
     }
 
     private fun isCorrect(word: String): Boolean {
@@ -105,6 +120,7 @@ class Words(val firstFile: String, val secondFile: String) {
     }
 
     fun start() {
+        tries = 0
         val firstFile = File(this.firstFile)
         val secondFile = File(this.secondFile)
 
@@ -119,11 +135,14 @@ class Words(val firstFile: String, val secondFile: String) {
         loadWords(firstFile)
         getSecretWord()
 
+        var start = System.currentTimeMillis()
         while (true) {
-            val word = askWord()
+            val word = askWord().lowercase()
+            tries++
 
             if (word == "exit") {
-                break
+                println("The game is over.")
+                System.exit(1)
             }
             if (!this.checkWordSizeIfFive(word)) {
                 println("The input isn't a 5-letter word.")
@@ -142,14 +161,25 @@ class Words(val firstFile: String, val secondFile: String) {
             }
 
             findCorrectLetters(word)
+
+            println()
+            println(clues.joinToString("\n"))
+            println()
             if (isCorrect(word)) {
                 println("Correct!")
                 break
             } else {
-                println(clue.joinToString(""))
+                println(letters.distinct().toList().joinToString(""))
             }
+
         }
-        println("The game is over.")
+        var end = System.currentTimeMillis()
+        val duration = end - start
+        if (tries == 1) {
+            println("Amazing luck! The solution was found at once.")
+        } else {
+            println("The solution was found after $tries tries in ${duration / 1000} seconds.")
+        }
     }
 }
 
